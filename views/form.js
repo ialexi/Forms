@@ -99,6 +99,18 @@ Forms.FormView = SC.View.extend(
 	isHidden: NO,
 	
 	/**
+		The input key view (to set previousKeyView for the first row, field, or sub-form).
+		
+		For fields, this will likely be the field itself.
+	*/
+	firstKeyView: null,
+	
+	/**
+		The output key view.
+	*/
+	lastKeyView: null,
+	
+	/**
 		YES if the form/row needs to be shown.
 		
 		This, in effect, allows a delayed call of show(), so that it is only called
@@ -440,7 +452,8 @@ Forms.FormView = SC.View.extend(
 			currentY = 0,
 			displayFields = this.get("_displayFields"),
 			len = displayFields.length,
-			fieldPositions = this._fieldPositions;
+			fieldPositions = this._fieldPositions,
+			currentKeyView = null; // parent views will correct
 			
 		// no matter what, check each row for label width—if it has that capability.
 		var regulatedWidth = this.get("regularLabelWidth");
@@ -495,6 +508,14 @@ Forms.FormView = SC.View.extend(
 			// if it is hidden, skip
 			if (item.get("isHidden")) continue;
 			
+			// handle key
+			if (item.firstKeyView)
+			{
+				if (currentKeyView) currentKeyView.nextKeyView = item.firstKeyView;
+				item.firstKeyView.previousKeyView = currentKeyView;
+				currentKeyView = item.lastKeyView;
+			}
+			
 			// update layout
 			item.adjust("top", currentY).updateLayout();
 			
@@ -515,6 +536,7 @@ Forms.FormView = SC.View.extend(
 			if (rowSpacing && height > 0) currentY += rowSpacing;
 		}
 		
+		this.set("lastKeyView", currentKeyView);
 	}
 });
 

@@ -22,18 +22,19 @@
 */
 
 Forms._DefaultAnimation = {
-	visibleState: { opacity: 1 },
-	hiddenState: { opacity: 0 },
+	visibleState: { opacity: 1, display: "block" },
+	hiddenState: { opacity: 0, display: "none" },
 	
 	// for labels
-	labelVisibleState: { opacity: 1 },
-	labelHiddenState: { opacity: 0 },
-	fieldVisibleState: { opacity: 1 },
-	fieldHiddenState: { opacity: 0 },
+	labelVisibleState: { opacity: 1, display: "block" },
+	labelHiddenState: { opacity: 0, display: "none" },
+	fieldVisibleState: { opacity: 1, display: "block" },
+	fieldHiddenState: { opacity: 0, display: "none" },
 	
+	fieldTransitions: { opacity: .25, top: .25, left: .25, display: .25 },
+	labelTransitions:  { opacity: .25, top: .25, left: .25, display: .25 },
 	
-	
-	transitions: { opacity: .25, top: .25, left: .25 },
+	transitions: { opacity: .25, top: .25, left: .25, display: .25 },
 	
 	show: function()
 	{
@@ -57,7 +58,9 @@ Forms._DefaultAnimation = {
 	
 	showLabel: function()
 	{
-		this.get("labelView").adjust(this.labelVisibleState);
+		var label = this.get("labelView");
+		label.adjust(this.labelVisibleState);
+		if (label.sizeMayChange) label.sizeMayChange();
 	},
 	
 	hideLabel: function()
@@ -67,7 +70,9 @@ Forms._DefaultAnimation = {
 	
 	showField: function()
 	{
-		this.get("field").adjust(this.fieldVisibleState);
+		var field = this.get("field");
+		field.adjust(this.fieldVisibleState);
+		if (field.sizeMayChange) field.sizeMayChange();
 	},
 	
 	hideField: function()
@@ -84,9 +89,8 @@ Forms._FormFieldAnimation = {
 	init: function()
 	{
 		// field class must be extended... BEFORE.
-		var transitions = { transitions: { opacity: .25, top: .25, left: .25 } };
-		this.fieldClass = this.fieldClass.extend(Animate.Animatable, transitions);
-		this.labelView = this.labelView.extend(Animate.Animatable, transitions);
+		this.fieldClass = this.fieldClass.extend(Animate.Animatable, this.fieldTransitions);
+		this.labelView = this.labelView.extend(Animate.Animatable, this.labelTransitions);
 		sc_super();
 	}
 };
@@ -94,5 +98,5 @@ Forms._FormFieldAnimation = {
 SC.mixin(Forms.FormAnimation, {
 	formMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimation],
 	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimation],
-	fieldMixin: [Forms._FormFieldAnimation, Animate.Animatable, Forms._DefaultAnimation]
+	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation]
 });

@@ -88,6 +88,10 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	isHidden: NO,
 	
 	/**
+		If YES, the field steals focus when it is begins editing.
+	*/
+	
+	/**
 		The type of field to automatically create and encapsulate.
 	*/
 	fieldClass: SC.TextFieldView,
@@ -110,6 +114,11 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		autoResize: YES
 	}),
 	
+	init: function()
+	{
+		sc_super();
+	},
+	
 	createChildViews: function()
 	{
 		sc_super();
@@ -130,6 +139,10 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		this.hideField();
 		this.showLabel();
 		this.set("activeView", this.get("labelView"));
+		
+		this.set("firstKeyView", this.field);
+		this.set("lastKeyView", this.field);
+		console.error("FKV: " + this.get("firstKeyView"));
 	},
 	
 	/**
@@ -217,6 +230,12 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		this.hideLabel();
 		this.set("activeView", this.get("field"));
 		this.set("isEditing", YES);
+		
+		// if it steals focus, handle that
+		if (this.stealsFocus)
+		{
+			this.get("field").beginEditing();
+		}
 	},
 
 	discardEditing: function()
@@ -291,27 +310,36 @@ Forms.FormFieldView.mixin({
 	*/
 	field: function(fieldClass, properties)
 	{
+		// get the form field view to use
+		var formFieldView = this._specializations[SC.guidFor(fieldClass)];
+		if (!formFieldView) formFieldView = Forms.FormFieldView;
+		
+		// mix in some default settings
 		var defaultSettings = {
 			layout: { left: 0, width: 200, height: 22, top: 0 }
 		};
 		SC.mixin(defaultSettings, properties);
 		
-		var settings = {  };
+		// set field properties
+		var fieldProperties = defaultSettings;
 		
-		var stealProperties = ["autoResize", "fieldKey", "classNames", "emptyValue", "autoHide"];
+		// prepare settings for form field 
+		var formFieldProperties = {  };
+		
+		var stealProperties = ["autoResize", "fieldKey", "classNames", "emptyValue", "autoHide", "stealsFocus"];
 		
 		for (var i = 0; i < stealProperties.length; i++)
 		{
-			if (!SC.none(properties[stealProperties[i]]))
+			if (!SC.none(fieldProperties[stealProperties[i]]))
 			{
-				settings[stealProperties[i]] = properties[stealProperties[i]];
-				delete properties[stealProperties[i]];
+				formFieldProperties[stealProperties[i]] = fieldProperties[stealProperties[i]];
+				delete fieldProperties[stealProperties[i]];
 			}
 		}
 		
-		settings.fieldClass = fieldClass.design(properties);
+		formFieldProperties.fieldClass = fieldClass.design(fieldProperties);
 		
-		return Forms.FormFieldView.design({mixinDesign: settings});
+		return formFieldView.design({mixinDesign: formFieldProperties });
 	},
 	
 	/**

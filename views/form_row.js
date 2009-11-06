@@ -269,7 +269,9 @@ Forms.FormRowView = Forms.FormView.extend(
 		var currentX = 0, 
 			currentY = 0, 
 			availableWidth = this.get("frame").width,
-			currentHeight = labelHeight;
+			currentHeight = labelHeight,
+			currentKeyView = null,
+			firstKeyView = null;
 		
 		// if the label is left-aligned and we are SHOWING the label
 		if (labelValue !== NO)
@@ -293,12 +295,24 @@ Forms.FormRowView = Forms.FormView.extend(
 		// FOR NOW, only flowing horizontally.
 		// should wrap around later, but that requires extra logic.
 		var fields = this.get("_displayFields"), fl = fields.length;
+		console.error("ROW");
 		for (var i = 0; i < fl; i++)
 		{
 			var field = fields[i];
 			
 			// skip if hidden
 			if (field.get("isHidden")) continue;
+			
+			// handle key
+			if (field.firstKeyView)
+			{
+				if (currentKeyView) currentKeyView.nextKeyView = field.firstKeyView;
+				field.firstKeyView.previousKeyView = currentKeyView;
+				currentKeyView = field.lastKeyView;
+				
+				// propagate first
+				if (!firstKeyView) firstKeyView = field.firstKeyView;
+			}
 			
 			// get the current layout
 			var fieldLayout = field.get("layout");
@@ -358,6 +372,8 @@ Forms.FormRowView = Forms.FormView.extend(
 		
 		// set our own height
 		this.adjust("height", currentHeight);
+		this.set("firstKeyView", firstKeyView);
+		this.set("lastKeyView", currentKeyView);
 		this.layoutDidChange();
 	}
 });
