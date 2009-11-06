@@ -28,10 +28,13 @@ Forms._DefaultAnimation = {
 	// for labels
 	labelVisibleState: { opacity: 1 },
 	labelHiddenState: { opacity: 0 },
-	fieldVisible: { opacity: 1 },
-	fieldHidden: { opacity: 0 },
+	fieldVisibleState: { opacity: 1 },
+	fieldHiddenState: { opacity: 0 },
+	
+	
 	
 	transitions: { opacity: .25, top: .25, left: .25 },
+	
 	show: function()
 	{
 		this.resetAnimation();
@@ -50,6 +53,26 @@ Forms._DefaultAnimation = {
 		this.adjust(this.hiddenState);
 		this.set("isHidden", YES);
 		this.layoutDidChange();
+	},
+	
+	showLabel: function()
+	{
+		this.get("labelView").adjust(this.labelVisibleState);
+	},
+	
+	hideLabel: function()
+	{
+		this.get("labelView").adjust(this.labelHiddenState);
+	},
+	
+	showField: function()
+	{
+		this.get("field").adjust(this.fieldVisibleState);
+	},
+	
+	hideField: function()
+	{
+		this.get("field").adjust(this.fieldHiddenState);
 	}
 };
 
@@ -57,8 +80,19 @@ Forms._DefaultAnimation = {
 Forms.FormAnimation = {
 };
 
+Forms._FormFieldAnimation = {
+	init: function()
+	{
+		// field class must be extended... BEFORE.
+		var transitions = { transitions: { opacity: .25, top: .25, left: .25 } };
+		this.fieldClass = this.fieldClass.extend(Animate.Animatable, transitions);
+		this.labelView = this.labelView.extend(Animate.Animatable, transitions);
+		sc_super();
+	}
+};
+
 SC.mixin(Forms.FormAnimation, {
 	formMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimation],
 	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimation],
-	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation]
+	fieldMixin: [Forms._FormFieldAnimation, Animate.Animatable, Forms._DefaultAnimation]
 });

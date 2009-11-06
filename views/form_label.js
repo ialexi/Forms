@@ -42,10 +42,22 @@ Forms.FormLabelView = SC.LabelView.extend(
 	
 	measure: function()
 	{
-		
 		// get layer (obviously...)
 		var layer = this.get("layer");
 		if (!layer) return;
+		var metrics = SC.metricsForString(this.get("value"), layer);
+		
+		var layout = this.get("layout");
+		if (!layout) layout = {};
+		if (layout.width != metrics.width || layout.height != metrics.height)
+		{
+			this.adjust({
+				width: metrics.width,
+				height: metrics.height
+			}).updateLayout();
+		}
+		
+		return;
 		
 		// store old settings
 		var ows = layer.style.whiteSpace,

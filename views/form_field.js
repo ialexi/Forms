@@ -106,7 +106,8 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		The label to show when not editing (during design time, just the class).
 	*/
 	labelView: Forms.FormLabelView.design({
-		layout: { top: 0, left: 0 }
+		layout: { top: 0, left: 0 },
+		autoResize: YES
 	}),
 	
 	createChildViews: function()
@@ -128,7 +129,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		// for now, just make edit. And when I test, I'll toggle this.
 		this.hideField();
 		this.showLabel();
-		this.set("active", this.get("labelView"));
+		this.set("activeView", this.get("labelView"));
 	},
 	
 	/**
@@ -138,7 +139,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	layoutDidChangeFor: function(child)
 	{
 		sc_super();
-		if (child == this.get("active"))
+		if (child == this.get("activeView"))
 		{
 			this._updateActiveLayout();
 		}
@@ -150,10 +151,11 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	*/
 	_updateActiveLayout: function()
 	{
-		var active = this.get("active");
+		var active = this.get("activeView");
 		if (!active) return;
 		
-		var frame = active.get("frame");
+		// we must recompute becaues we may be more modern than the last calculation.
+		var frame = active.computeFrameWithParentFrame(null);
 		
 		this.adjust({
 			width: frame.width,
@@ -213,7 +215,8 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		
 		this.showField();
 		this.hideLabel();
-		this.set("active", this.get("field"));
+		this.set("activeView", this.get("field"));
+		this.set("isEditing", YES);
 	},
 
 	discardEditing: function()
@@ -228,7 +231,8 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		
 		this.hideField();
 		this.showLabel();
-		this.set("active", this.get("labelView"));
+		this.set("activeView", this.get("labelView"));
+		this.set("isEditing", NO);
 	},
 	
 	/**
@@ -292,9 +296,7 @@ Forms.FormFieldView.mixin({
 		};
 		SC.mixin(defaultSettings, properties);
 		
-		var settings = {
-			fieldClass: fieldClass.design(properties)
-		};
+		var settings = {  };
 		
 		var stealProperties = ["autoResize", "fieldKey", "classNames", "emptyValue", "autoHide"];
 		
@@ -307,7 +309,9 @@ Forms.FormFieldView.mixin({
 			}
 		}
 		
-		return Forms.FormFieldView.design(settings);
+		settings.fieldClass = fieldClass.design(properties);
+		
+		return Forms.FormFieldView.design({mixinDesign: settings});
 	},
 	
 	/**

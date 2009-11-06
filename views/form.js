@@ -32,6 +32,10 @@
 	This is important, because this is how you make nice rows that have a
 	label and a field: these rows are actually subclasses of FormView itself.
 	
+	h2. Editing
+	The form does not allow editing by default; editing must be started by calling
+	beginEditing.
+	
 	
 	@extends SC.View
 	@implements SC.Editable
@@ -225,6 +229,47 @@ Forms.FormView = SC.View.extend(
 		
 		/* Extend */
 		return child.extend.apply(child, mixin);
+	},
+	
+	/**
+		Begins editing. Does NOT become first responder or anything; just changes editing state.
+		
+		Someone tell me if I'm misunderstanding how responders should be used. Thanks.
+	*/
+	beginEditing: function()
+	{
+		if (this.get("isEditing")) return YES;
+		
+		// relay to all fields...
+		var fields = this.get("_displayFields"),
+			fl = fields.length;
+
+		for (var i = 0; i < fl; i++)
+		{
+			var field = fields[i];
+			field.beginEditing();
+		}
+		
+		this.set("isEditing", YES);
+		return YES;
+	},
+	
+	commitEditing: function()
+	{
+		if (!this.get("isEditing")) return YES;
+		
+		// relay to all fields...
+		var fields = this.get("_displayFields"),
+			fl = fields.length;
+		
+		for (var i = 0; i < fl; i++)
+		{
+			var field = fields[i];
+			field.commitEditing();
+		}
+		
+		this.set("isEditing", NO);
+		return YES;
 	},
 	
 	/**
