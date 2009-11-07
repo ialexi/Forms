@@ -74,10 +74,12 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	*/
 	isEmpty: function()
 	{
+		if (this.get("isEditing")) return NO;
+		
 		var ev = this.get("emptyValues");
 		if (ev.indexOf(this.get("value")) >= 0) return YES;
 		return NO;
-	}.property("emptyValues", "value").cacheable(),
+	}.property("emptyValues", "value", "isEditing").cacheable(),
 	
 	/**
 		YES if it is hidden.
@@ -142,7 +144,6 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		
 		this.set("firstKeyView", this.field);
 		this.set("lastKeyView", this.field);
-		console.error("FKV: " + this.get("firstKeyView"));
 	},
 	
 	/**
@@ -206,6 +207,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		
 		var newHidden = NO;
 		if (this.get("isEmpty") && this.get("autoHide")) newHidden = YES;
+		if (this.get("isEditing")) newHidden = NO;
 		
 		if (currentHidden !== newHidden)
 		{
@@ -230,6 +232,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		this.hideLabel();
 		this.set("activeView", this.get("field"));
 		this.set("isEditing", YES);
+		this.calculateHiddenness();
 		
 		// if it steals focus, handle that
 		if (this.stealsFocus)
@@ -252,6 +255,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		this.showLabel();
 		this.set("activeView", this.get("labelView"));
 		this.set("isEditing", NO);
+		this.calculateHiddenness();
 	},
 	
 	/**

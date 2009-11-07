@@ -123,6 +123,11 @@ Forms.FormView = SC.View.extend(
 	needsDisplay: NO,
 	
 	/**
+		The content to bind the form to.
+	*/
+//	content: null,
+	
+	/**
 		@private
 		An array of actual SproutCore views.
 		
@@ -384,7 +389,8 @@ Forms.FormView = SC.View.extend(
 	
 	emptinessDidChange: function()
 	{
-		if (this.parentView.emptinessDidChangeFor) this.parentView.emptinessDidChangeFor(this);
+		var parentView = this.get("parentView");
+		if (parentView && parentView.emptinessDidChangeFor) parentView.emptinessDidChangeFor(this);
 	}.observes("isEmpty"),
 	
 	layoutChildViews: function()

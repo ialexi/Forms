@@ -295,7 +295,6 @@ Forms.FormRowView = Forms.FormView.extend(
 		// FOR NOW, only flowing horizontally.
 		// should wrap around later, but that requires extra logic.
 		var fields = this.get("_displayFields"), fl = fields.length;
-		console.error("ROW");
 		for (var i = 0; i < fl; i++)
 		{
 			var field = fields[i];

@@ -21,6 +21,9 @@
 	(which is why you see them in an array).
 */
 
+// there is no use in adding this if there is no Animate instance.
+if (Animate) {
+
 Forms._DefaultAnimation = {
 	visibleState: { opacity: 1, display: "block" },
 	hiddenState: { opacity: 0, display: "none" },
@@ -31,10 +34,10 @@ Forms._DefaultAnimation = {
 	fieldVisibleState: { opacity: 1, display: "block" },
 	fieldHiddenState: { opacity: 0, display: "none" },
 	
-	fieldTransitions: { opacity: .25, top: .25, left: .25, display: .25 },
-	labelTransitions:  { opacity: .25, top: .25, left: .25, display: .25 },
+	fieldTransitions: { opacity: .25, top: .25, left: .25, display: .5 },
+	labelTransitions:  { opacity: .25, top: .25, left: .25, display: .5 },
 	
-	transitions: { opacity: .25, top: .25, left: .25, display: .25 },
+	transitions: { opacity: .25, top: .25, left: .25, display: .5 },
 	
 	show: function()
 	{
@@ -100,3 +103,5 @@ SC.mixin(Forms.FormAnimation, {
 	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimation],
 	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation]
 });
+
+};
