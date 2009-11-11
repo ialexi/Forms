@@ -398,11 +398,23 @@ Forms.FormRowView.mixin({
 		{
 			var fieldSettings = settings;
 			
+			// rowLabel is for us...
 			var rowLabel = fieldSettings["fieldLabel"];
+			
+			// as is autoHide
+			var autoHide = NO;
+			if (settings["autoHide"])
+			{
+				autoHide = settings["autoHide"];
+				settings["autoHide"] = NO;
+			}
+			
+			// now
 			settings = {
-				fields: 'autoField',
+				fields: ['autoField'],
 				fieldLabel: rowLabel,
-				autoField: Forms.FormView.field(optionalClass, fieldSettings)
+				autoField: Forms.FormView.field(optionalClass, fieldSettings),
+				autoHide: autoHide
 			};
 		}
 		

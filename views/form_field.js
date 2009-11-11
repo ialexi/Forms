@@ -33,9 +33,12 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		If YES, the field is automatically hidden when empty and not editing.
 		
 		Note that this has <storng>nothing</strong> to do with rows auto-hiding.
-		When a field auto-hides, it just sets its isHidden to true as a hint to
+		When a field auto-hides, it just sets its isHidden to YES as a hint to
 		parents (which are the ones that have the resonsibility of updating flowing)
 		and sets isVisible (which, if you are lucky, the animate layer overrides).
+		
+		You <strong>do not</strong> usually need to make <em>fields</em> autoHide. 
+		Usually, you would instead make the <em>rows</em> autoHide.
 		
 		The parent objects handle flowing, skipping hidden items, because we don't
 		actually want to change the object's size to 0x0; rather, we want the
@@ -243,7 +246,21 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		// if it steals focus, handle that
 		if (this.stealsFocus)
 		{
+			// delay so it will trigger after we set display.
+			SC.Timer.schedule({
+				interval: 1,
+				target: this,
+				action: "stealFocus"
+			});
+		}
+	},
+	
+	stealFocus: function()
+	{
+		try {
 			this.get("field").beginEditing();
+		} catch (e) {
+			// don't need to do anything. We tried our best.
 		}
 	},
 

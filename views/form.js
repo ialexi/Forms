@@ -84,7 +84,7 @@ Forms.FormView = SC.View.extend(
 	row, we should probably write a FormRowView subclass just for that, that would incorporate
 	other things, such as classNames, as well.
 	*/
-	autoHide: YES,
+	autoHide: NO,
 	
 	/**
 		YES if the form/row is empty, as calculated by relayoutFields.

@@ -5,12 +5,7 @@
 .sc-text-field-view.not-empty .sc-hint { display: none; }
 
 /* The hint should have the same alignment as the text inside the box */
-/* For some reason, Safari has the label 3px too low... */
 .sc-text-field-view .sc-hint { top:0px; left: 0px; right: 0px; bottom: 0px; }
-.sc-view .sc-text-field-view { border: 1px solid transparent; }
-.sc-view .sc-text-field-view.focus { outline:0px none; border: 1px solid #888; -moz-box-shadow: 3px 3px 5px gray; -webkit-box-shadow: 3px 3px 5px gray; z-index:500; }
-.safari .sc-view .sc-text-field-view.focus {outline:0px none;}
-.mozilla .sc-view .sc-text-field-view.focus {outline:0px none;}
 
 /* Stuff for measuring */
 .sc-text-field-view textarea, .sc-text-field-view input { white-space:pre-wrap; overflow: hidden; }
