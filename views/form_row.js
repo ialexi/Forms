@@ -71,6 +71,12 @@ Forms.FormRowView = Forms.FormView.extend(
 	fieldLabel: null,
 	
 	/**
+		Some class names for the row.
+	*/
+	classNames: ["sc-form-row-view"],
+	
+	
+	/**
 		The regulated width of the label—regulation allows alignment: YAY!
 	*/
 	regularLabelWidth: 200,

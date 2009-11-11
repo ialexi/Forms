@@ -92,6 +92,12 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	/**
 		If YES, the field steals focus when it is begins editing.
 	*/
+	stealsFocus: NO,
+	
+	/**
+		Some class names for the field.
+	*/
+	classNames: ["sc-form-field-view"],
 	
 	/**
 		The type of field to automatically create and encapsulate.

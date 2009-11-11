@@ -42,13 +42,14 @@ Forms.FormLabelView = SC.LabelView.extend(
 		var layer = this.get("layer");
 		if (!layer) return;
 		var metrics = SC.metricsForString(this.get("value"), layer);
-		
 		var layout = this.get("layout");
 		if (!layout) layout = {};
 		if (layout.width != metrics.width || layout.height != metrics.height)
 		{
 			this.adjust({
-				width: metrics.width,
+				width: metrics.width + 1, // add tolerance because no one cares about 1px (yet) and Firefox
+				// sometimes needs it.
+				
 				height: metrics.height
 			}).updateLayout();
 		}

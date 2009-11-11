@@ -16,6 +16,11 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 	{
 		var self = this;
 		this.fieldClass = this.fieldClass.extend({
+			_topOffsetForFirefoxCursorFix: 0,
+			init: function()
+			{
+				sc_super();
+			},
 			keyDown: function(e)
 			{
 				self.keyDown(e, this.$input()[0]);
@@ -26,9 +31,34 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 			{
 				sc_super();
 				
-				// a small improvement
+				// a small improvement for some use cases (need an autoSelect option, though)
+				var layer = this.$input()[0];
+				if (layer) {
+					SC.Timer.schedule({ // have to do it in a timer for Firefox to be happy.
+						interval: 1,
+						target: this,
+						action: "performAutoSelect"
+					});
+				}
+			},
+			
+			performAutoSelect: function()
+			{
 				var layer = this.$input()[0];
 				if (layer) layer.select();
+			},
+			
+			didUpdateLayer: function()
+			{
+				sc_super();
+				this._applyFirefoxCursorFix();
+			},
+			
+			_animation_getTextFields: function(start)
+			{
+				start.next_field = this;
+				this.next_field = null;
+				return this;
 			}
 		});
 		sc_super();
@@ -61,31 +91,73 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 		if (str) this.measure(input.value + str);
 	},
 	
+	_animation_getTextFields: function(start)
+	{
+		return this.get("field")._animation_getTextFields(start);
+	},
+	
+	/**
+		Automatically resizes the text field. However, if it is a text area, it only resizes
+		the height.
+	*/
 	measure: function(value)
 	{
-		// get layer (obviously...)
-		var layer = this.$("input")[0];
+		var autoResizeWidth = !this.get("field").get("isTextArea");
+		
+		// get value
+		if (typeof value != "string") value = this.get("value");
+		
+		// get layer... but which?
+		var layer = this.get("field").$input()[0];
+		
+		// if there is no layer, we can't do anything
 		if (!layer) return;
 		
-		if (typeof value != "string") value = this.get("value");
+		// determine what value to measure (hint or real)
+		if (!value || value === "")
+		{
+			// layer = this.$(".sc-hint")[0]; there is some weirdness measuring this. Why not measure the field itself?
+			value = this.getPath("field.hint");
+		}
+		else
+		{
+			// the real value should have a character added to it if it is multiline,
+			// so that the extra line may be considered in flowing.
+			var lio = value.lastIndexOf("\n");
+			if (lio == value.length - 1) value += "x";
+		}
+		
 		var field_metrics = SC.metricsForString(value, layer);
 		
+		var hPadding = 6, vPadding = 3;
+		
+		// correct WebKit spacing issue
+		if (SC.browser.webkit)
+		{
+			hPadding += 3;
+		}
+		
 		var our_metrics = {
-			width: field_metrics.width + layer.parentNode.offsetLeft + 3,
-			height: field_metrics.height + layer.parentNode.offsetTop + 3
+			width: field_metrics.width + hPadding,
+			height: field_metrics.height + vPadding
 		};
 		
 		var layout = this.get("layout");
 		if (!layout) layout = {};
 		if (layout.width != our_metrics.width || layout.height != our_metrics.height)
 		{
-			this.field.adjust({
-				width: our_metrics.width,
-				height: our_metrics.height
-			}).updateLayout();
+			if (autoResizeWidth) 
+			{
+				this.field.adjust("width", our_metrics.width);
+				layer.style.width = (3 + field_metrics.width) + "px";
+			}
 			
-			layer.style.width = (3 + field_metrics.width) + "px";
 			layer.style.height = (3 + field_metrics.height) + "px";
+			
+			this.field.adjust({
+				"height": our_metrics.height
+			}).updateLayout();
+			this.field._applyFirefoxCursorFix();
 		}
 	}.observes("value")
 });

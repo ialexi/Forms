@@ -397,7 +397,13 @@ Forms.FormView = SC.View.extend(
 	{
 		// update layout, but before you do, please relayout the fields
 		// from invalidate start point.
-		if (!SC.none(this._invalidateFrom)) this.relayoutFields(this._invalidateFrom);
+		if (!SC.none(this._invalidateFrom))
+		{
+			this.relayoutFields(this._invalidateFrom);
+			
+			// if we have any hacks (for instance, for firefox) call those
+			if (this._relayout_hacks) this._relayout_hacks();
+		}
 		
 		this._invalidateFrom = null;
 
@@ -445,7 +451,7 @@ Forms.FormView = SC.View.extend(
 	/**
 		Re-lays-out the fields that this form view manages. 
 		
-		FormView Just stacks them, but the way it does so is acceptable to animation.		
+		FormView Just stacks them, but the way it does so is acceptable to animation.
 		
 		
 		@param {Number} startPoint
