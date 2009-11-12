@@ -87,6 +87,11 @@ Forms.FormView = SC.View.extend(
 	autoHide: NO,
 	
 	/**
+	Whether to automatically start editing.
+	*/
+	editsByDefault: YES,
+	
+	/**
 		YES if the form/row is empty, as calculated by relayoutFields.
 	*/
 	isEmpty: NO,
@@ -157,6 +162,15 @@ Forms.FormView = SC.View.extend(
 		Fields to invalidate next run-through
 	*/
 	_invalidateFrom: null,
+	
+	/**
+		Init function.
+	*/
+	init: function()
+	{
+		if (this.get("editsByDefault")) this.set("isEditing", YES);
+		sc_super();
+	},
 	
 	/**
 		Calls _updateFields to load the fields.
@@ -330,6 +344,9 @@ Forms.FormView = SC.View.extend(
 			}
 			
 			result.push(view);
+			
+			// populate editing
+			if (this.get("isEditing")) view.beginEditing();
 		}
 		
 		this.set("_displayFields", result);

@@ -64,6 +64,10 @@ Forms.FormRowView = Forms.FormView.extend(
 		Note: all of the auto-hide goodies, etc., are available here.
 	*/
 	
+	/**
+	Defaults to NO for row because the Form will cascade, of course.
+	*/
+	editsByDefault: NO,
 	
 	/**
 	The text the label can show—can be bound, naturally.
