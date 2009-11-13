@@ -15,3 +15,6 @@
 /* Show overflow so field effects will be visible */
 .sc-form-row-view { overflow:visible; }
 .sc-form-field-view { overflow:visible; }
+
+/* Radio button labels need to support auto-resize nicely. Usually, they should not wrap. */
+.sc-radio-button .sc-button-label { white-space:pre; }

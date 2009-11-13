@@ -34,10 +34,10 @@ Forms._DefaultAnimation = {
 	fieldVisibleState: { opacity: 1, display: "block" },
 	fieldHiddenState: { opacity: 0, display: "none" },
 	
-	fieldTransitions: { opacity: .25, display: .5 },
-	labelTransitions:  { opacity: .25, display: .5 },
+	fieldTransitions: { opacity: 0.25, display: 0.5 },
+	labelTransitions:  { opacity: 0.25, display: 0.5 },
 	
-	transitions: { opacity: .25, top: .25, left: .25, display: .5 },
+	transitions: { opacity: 0.25, top: 0.25, left: 0.25, display: 0.5 },
 	
 	show: function()
 	{
@@ -98,8 +98,6 @@ if (SC.browser.mozilla)
 		initMixin: function()
 		{
 			// we need to add stuff, unfortunately.
-			this._cssTransitionFor["top"] = NO;
-			
 			if (SC.browser.mozilla)
 			{
 				this._cssTransitionFor["top"] = NO;
@@ -128,7 +126,7 @@ if (SC.browser.mozilla)
 				var field = fields[i];
 				if (field._animation_getTextFields)
 				{
-					new_start = field._animation_getTextFields(start);
+					var new_start = field._animation_getTextFields(start);
 					
 					// if we don't have a starting field, set it.
 					if (!our_start) our_start = start.next_field;
@@ -166,36 +164,22 @@ if (SC.browser.mozilla)
 			this._animation_getTextFields();
 		}
 	});
-};
+}
 
 Forms._FormFieldAnimation = {
-	init: function()
+	// an optional function we are filling in...
+	preInitMixin: function()
 	{
-		// field class must be extended... BEFORE.
-		this.fieldClass = this.fieldClass.extend(Animate.Animatable, this.fieldTransitions);
-		this.labelView = this.labelView.extend(Animate.Animatable, this.labelTransitions);
-		
-		sc_super();
-		
-		if (SC.browser.mozilla)
-		{
-			this._cssTransitionFor["top"] = NO;
-			this._cssTransitionFor["left"] = NO;
-			this._original_animateTickPixel = this._animateTickPixel;
-			this._animateTickPixel = this._replace_animateTickPixel;
-		}
+		this.fieldClass = this.fieldClass.extend(Animate.Animatable, { transitions: this.fieldTransitions });
+		this.labelView = this.labelView.extend(Animate.Animatable, { transitions: this.labelTransitions });
 	},
-	_replace_animateTickPixel: function()
-	{
-		this.holder._original_animateTickPixel.apply(this, arguments);
-		this.holder.field._applyFirefoxCursorFix();
-	}
+	transitions: { left: null, top: null, opacity: 0.25, display: 0.5 }
 };
 
 SC.mixin(Forms.FormAnimation, {
 	formMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks],
-	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks],
-	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation]
+	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks]
+//	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation] <- has problems and I don't like anyway.
 });
 
-};
+}

@@ -129,7 +129,7 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 		
 		var field_metrics = SC.metricsForString(value, layer);
 		
-		var hPadding = 6, vPadding = 3;
+		var hPadding = 6, vPadding = 9;
 		
 		// correct WebKit spacing issue
 		if (SC.browser.webkit)

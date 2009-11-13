@@ -116,7 +116,7 @@ Forms.FormRowView = Forms.FormView.extend(
 		@note "smart-center" ignores this value for centering, but uses it for
 		top align.
 	*/
-	labelVerticalOffset: 10,
+	labelVerticalOffset: 0,
 	
 	/**
 		The horizontal alignment for the label.

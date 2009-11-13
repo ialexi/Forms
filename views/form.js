@@ -254,6 +254,13 @@ Forms.FormView = SC.View.extend(
 		}
 		mixin = SC.A(mixin);
 		
+		// push onto the top our own set of mixins
+		mixin.unshift({
+			fieldMixin: this.fieldMixin,
+			rowMixin: this.rowMixin,
+			formMixin: this.formMixin
+		});
+		
 		/* Add design */
 		// note that child.design could be NO...
 		if (child.prototype.mixinDesign) mixin = mixin.concat(SC.A(child.prototype.mixinDesign));
@@ -440,6 +447,10 @@ Forms.FormView = SC.View.extend(
 		{
 			if (hide) this.hide();
 			else this.show();
+			
+			// we've been stalling this, so go ahead and do it now.
+			// optimal thing would be to keep a running boolean of if a relayout is needed.
+			this.relayoutFields();
 		}
 	}.observes("autoHide", "isEmpty"),
 	

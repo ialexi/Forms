@@ -29,6 +29,7 @@ require("views/form_label");
 */
 Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 /** @scope Forms.FormFieldView.prototype */ {
+	concatenatedProperties: ["applyMixins"],
 	/**
 		If YES, the field is automatically hidden when empty and not editing.
 		
@@ -125,34 +126,73 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		autoResize: YES
 	}),
 	
+	
+	/**
+		A set of functions which may be overriden by mixins (it is a concatenated property).
+	*/
+	preInitMixin: function()
+	{
+		
+	},
+	
 	init: function()
 	{
+		var mixins = SC.$A(this.preInitMixin);
+		var i = 0, l = mixins.length;
+		for (i = 0; i < l; i++)
+		{
+			mixins[i].call(this);
+		}
+		
 		sc_super();
 	},
 	
+	/**
+		Controls the initialization of the field and label.
+	*/
 	createChildViews: function()
 	{
 		sc_super();
 		
-		// basically just pass on our own bindings
-		this.field = this.createChildView(this.get("fieldClass"));
-		this.field.bind("value", [this, "value"]);
-		this.field.bind("autoResize", [this, "autoResize"]);
-		this.appendChild(this.field);
+		// setup the things
+		this.setupLabelView();
+		this.setupFieldView();
+		this.updateEditingState();
 		
+		// for now, just make edit. And when I test, I'll toggle this.
+		this.set("activeView", this.get("labelView"));
+		
+		this.set("firstKeyView", this.field);
+		this.set("lastKeyView", this.field);
+	},
+	
+	/**
+		Creates the label (idle representation) of the view.
+		
+		You know, not all fields want to use a label for their idle representations. So,
+		you can override this function to handle that.
+	*/
+	setupLabelView: function()
+	{
 		// same with label
 		this.labelView = this.createChildView(this.get("labelView"));
 		this.labelView.bind("value", [this, "value"]);
 		this.labelView.bind("autoResize", [this, "autoResize"]);
 		this.appendChild(this.labelView);
+	},
+	
+	/**
+		Creates the field (editing representation).
 		
-		// for now, just make edit. And when I test, I'll toggle this.
-		this.hideField();
-		this.showLabel();
-		this.set("activeView", this.get("labelView"));
-		
-		this.set("firstKeyView", this.field);
-		this.set("lastKeyView", this.field);
+		You usually don't need to override this, but you can.
+	*/
+	setupFieldView: function()
+	{
+		// basically just pass on our own bindings
+		this.field = this.createChildView(this.get("fieldClass"));
+		this.field.bind("value", [this, "value"]);
+		this.field.bind("autoResize", [this, "autoResize"]);
+		this.appendChild(this.field);
 	},
 	
 	/**
@@ -179,6 +219,24 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		
 		// we must recompute becaues we may be more modern than the last calculation.
 		var frame = active.computeFrameWithParentFrame(null);
+		
+		// now we need to add our own padding, which we have to get from computed style
+		var layer = this.get("layer");
+		if (layer)
+		{
+			var computed = null;
+			if (document.defaultView && document.defaultView.getComputedStyle) {
+				computed = document.defaultView.getComputedStyle(layer, null);
+			} else {
+				computed = layer.currentStyle;
+			}
+			
+			// i really don't like this...
+			if (computed.paddingLeft) frame.width += parseInt(computed.paddingLeft);
+			if (computed.paddingTop) frame.height += parseInt(computed.paddingTop);
+			if (computed.paddingRight) frame.width += parseInt(computed.paddingRight);
+			if (computed.paddingBottom) frame.height += parseInt(computed.paddingBottom);
+		}
 		
 		this.adjust({
 			width: frame.width,
@@ -236,9 +294,6 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	beginEditing: function()
 	{
 		if (this.get('isEditing')) return YES;
-		
-		this.showField();
-		this.hideLabel();
 		this.set("activeView", this.get("field"));
 		this.set("isEditing", YES);
 		this.calculateHiddenness();
@@ -273,12 +328,21 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	commitEditing: function()
 	{
 		if (!this.get("isEditing")) return YES;
-		
-		this.hideField();
-		this.showLabel();
 		this.set("activeView", this.get("labelView"));
 		this.set("isEditing", NO);
 		this.calculateHiddenness();
+	},
+	
+	isEditingDidChange: function()
+	{
+		this.updateEditingState();
+	}.observes("isEditing"),
+	
+	updateEditingState: function()
+	{
+		var editing = this.get("isEditing");
+		if (!editing) { this.hideField(); this.showLabel(); }
+		else { this.showField(); this.hideLabel(); }
 	},
 	
 	/**
@@ -337,29 +401,36 @@ Forms.FormFieldView.mixin({
 	*/
 	field: function(fieldClass, properties)
 	{
+		// we'll put properties for the field itself here:
+		var fieldProperties = {};
+		
 		// get the form field view to use
 		var formFieldView = this._specializations[SC.guidFor(fieldClass)];
-		if (!formFieldView) formFieldView = Forms.FormFieldView;
+		if (!formFieldView) 
+		{
+			// no specialization, so get default.
+			formFieldView = Forms.FormFieldView;
+			
+			// mixin default field properties for unknown field types
+			// specializations have their own, naturally.
+			SC.mixin(fieldProperties, {
+				layout: { left: 0, width: 200, height: 22, top: 0 }
+			});
+		}
 		
-		// mix in some default settings
-		var defaultSettings = {
-			layout: { left: 0, width: 200, height: 22, top: 0 }
-		};
-		SC.mixin(defaultSettings, properties);
+		// mix in settings
+		SC.mixin(fieldProperties, properties);
 		
-		// set field properties
-		var fieldProperties = defaultSettings;
+		// prepare settings for form field (it gets all settings, just in case)
+		var formFieldProperties = SC.clone(fieldProperties);
 		
-		// prepare settings for form field 
-		var formFieldProperties = {  };
-		
+		// stolen properties are used ONLY one place.
 		var stealProperties = ["autoResize", "fieldKey", "classNames", "emptyValue", "autoHide", "stealsFocus"];
 		
 		for (var i = 0; i < stealProperties.length; i++)
 		{
 			if (!SC.none(fieldProperties[stealProperties[i]]))
 			{
-				formFieldProperties[stealProperties[i]] = fieldProperties[stealProperties[i]];
 				delete fieldProperties[stealProperties[i]];
 			}
 		}
