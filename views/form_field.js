@@ -97,7 +97,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 	/**
 		Some class names for the field.
 	*/
-	classNames: ["sc-form-field-view"],
+	classNames: ["forms-field-view"],
 	
 	/**
 		The type of field to automatically create and encapsulate.
@@ -144,7 +144,7 @@ Forms.FormFieldView = SC.View.extend(SC.Editable, SC.Control,
 		this.appendChild(this.labelView);
 		
 		// for now, just make edit. And when I test, I'll toggle this.
-		this.hideField();
+    this.hideField();
 		this.showLabel();
 		this.set("activeView", this.get("labelView"));
 		
