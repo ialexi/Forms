@@ -77,7 +77,7 @@ Forms.FormRowView = Forms.FormView.extend(
 	/**
 		Some class names for the row.
 	*/
-	classNames: ["sc-form-row-view"],
+	classNames: ["forms-row-view"],
 	
 	
 	/**
