@@ -557,7 +557,7 @@ Forms.FormView = SC.View.extend(
 			}
 			
 			// update layout
-			item.adjust("top", currentY).updateLayout();
+			item.adjust("top", currentY);
 			
 			// if it still needs to be shown, do it...
 			if (item.get("needsDisplay")) item.display();

@@ -335,7 +335,7 @@ Forms.FormRowView = Forms.FormView.extend(
 					field.adjust({
 						left: currentX,
 						top: currentY
-					}).updateLayout();
+					});
 				}
 				
 				// if it still needs to be shown, do it...

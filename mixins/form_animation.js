@@ -34,10 +34,10 @@ Forms._DefaultAnimation = {
 	fieldVisibleState: { opacity: 1, display: "block" },
 	fieldHiddenState: { opacity: 0, display: "none" },
 	
-	fieldTransitions: { opacity: 0.25, display: 0.5 },
-	labelTransitions:  { opacity: 0.25, display: 0.5 },
+	fieldTransitions: { opacity: 0.5, display: 0.5 },
+	labelTransitions:  { opacity: 0.5, display: 0.5 },
 	
-	transitions: { opacity: 0.25, top: 0.25, left: 0.25, display: 0.5 },
+	transitions: { opacity: 0.25, top: 0.5, left: 0.5, display: 0.5 },
 	
 	show: function()
 	{
@@ -181,5 +181,14 @@ SC.mixin(Forms.FormAnimation, {
 	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks]
 //	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation] <- has problems and I don't like anyway.
 });
+
+Forms.DemoTransitions = {
+	transitions: { opacity: .75, top: .75, left: .75, display: 1.25 }
+};
+
+Forms.FormAnimation.DemoMode = {
+	formMixin: [ Forms.DemoTransitions ],
+	rowMixin: [ Forms.DemoTransitions ]
+};
 
 }
