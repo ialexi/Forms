@@ -22,7 +22,7 @@
 */
 
 // there is no use in adding this if there is no Animate instance.
-if (Animate) {
+if (SC.Animatable) {
 
 Forms._DefaultAnimation = {
 	visibleState: { opacity: 1, display: "block" },
@@ -170,16 +170,16 @@ Forms._FormFieldAnimation = {
 	// an optional function we are filling in...
 	preInitMixin: function()
 	{
-		this.fieldClass = this.fieldClass.extend(Animate.Animatable, { transitions: this.fieldTransitions });
-		this.labelView = this.labelView.extend(Animate.Animatable, { transitions: this.labelTransitions });
+		this.fieldClass = this.fieldClass.extend(SC.Animatable, { transitions: this.fieldTransitions });
+		this.labelView = this.labelView.extend(SC.Animatable, { transitions: this.labelTransitions });
 	},
 	transitions: { left: null, top: null, opacity: 0.25, display: 0.5 }
 };
 
 SC.mixin(Forms.FormAnimation, {
-	formMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks],
-	rowMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks]
-//	fieldMixin: [Animate.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation] <- has problems and I don't like anyway.
+	formMixin: [SC.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks],
+	rowMixin: [SC.Animatable, Forms._DefaultAnimation, Forms.FormAnimationHacks]
+//	fieldMixin: [SC.Animatable, Forms._DefaultAnimation, Forms._FormFieldAnimation] <- has problems and I don't like anyway.
 });
 
 Forms.DemoTransitions = {
