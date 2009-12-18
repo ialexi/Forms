@@ -1,9 +1,5 @@
 /* This default stylesheet for forms maximizes fluidity. */
 
-/* Hints should show, even if focused */
-.sc-text-field-view.focus .sc-hint { display: block; }
-.sc-text-field-view.not-empty .sc-hint { display: none; }
-
 /* The hint should have the same alignment as the text inside the box */
 .sc-text-field-view .sc-hint { top:0px; left: 0px; right: 0px; bottom: 0px; }
 
