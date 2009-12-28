@@ -27,6 +27,12 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 				return sc_super();
 			},
 			
+			keyUp: function(e)
+			{
+			  self.keyUp(e, this.$input()[0]);
+			  return sc_super();
+			},
+			
 			beginEditing: function()
 			{
 				sc_super();
@@ -87,8 +93,18 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 	keyDown: function(e, input)
 	{
 		sc_super();
+		if (e.metaKey || e.ctrlKey) return; // don't remeasure until keyUp.
 		var str = e.getCharString();
+		
+		// special cases: text area press enter
+		if (e.keyCode == 13 && this.get("field").get("isTextArea")) str = "\nx";
+		
+		// measure!
 		if (str) this.measure(input.value + str);
+	},
+	
+	keyUp: function(e, input){
+	  if (input) this.measure(input.value);
 	},
 	
 	_animation_getTextFields: function(start)
@@ -116,7 +132,6 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 		// determine what value to measure (hint or real)
 		if (!value || value === "")
 		{
-			// layer = this.$(".sc-hint")[0]; there is some weirdness measuring this. Why not measure the field itself?
 			value = this.getPath("field.hint");
 		}
 		else
@@ -144,21 +159,22 @@ Forms.FormTextFieldView = Forms.FormFieldView.extend(
 		
 		var layout = this.get("layout");
 		if (!layout) layout = {};
-		if (layout.width != our_metrics.width || layout.height != our_metrics.height)
+
+    // we used to check to see if it is different than the existing width...
+    // however, that is not reliable because sometimes the width is changed artificially (not related to measure())
+		if (autoResizeWidth) 
 		{
-			if (autoResizeWidth) 
-			{
-				this.field.adjust("width", our_metrics.width);
-				layer.style.width = (3 + field_metrics.width) + "px";
-			}
-			
-			layer.style.height = (3 + field_metrics.height) + "px";
-			
-			this.field.adjust({
-				"height": our_metrics.height
-			}).updateLayout();
-			this.field._applyFirefoxCursorFix();
+			this.field.adjust("width", our_metrics.width);
+			layer.style.width = (3 + field_metrics.width) + "px";
 		}
+		
+		layer.style.height = (3 + field_metrics.height) + "px";
+		
+		this.field.adjust({
+			"height": our_metrics.height
+		}).updateLayout();
+		this.field._applyFirefoxCursorFix();
+
 	}.observes("value")
 });
 
