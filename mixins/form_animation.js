@@ -2,7 +2,7 @@
 // Project:   Forms.FormAnimation
 // Copyright: ©2009 TPSi
 // ==========================================================================
-
+/*globals Forms*/
 /** @namespace
 	This mixin adds animation support to forms. It propagates itself by
 	mixing in some of its attributes (which may be overriden):
@@ -34,10 +34,14 @@ Forms._DefaultAnimation = {
 	fieldVisibleState: { opacity: 1, display: "block" },
 	fieldHiddenState: { opacity: 0, display: "none" },
 	
-	fieldTransitions: { opacity: 0.5, display: 0.5 },
-	labelTransitions:  { opacity: 0.5, display: 0.5 },
+	fieldTransitions: { opacity: 0.125, display: 0.5 },
+	labelTransitions:  { opacity: 0.125, display: 0.5 },
 	
-	transitions: { opacity: 0.25, top: 0.5, left: 0.5, display: 0.5 },
+	transitions: { 
+	  opacity: { duration: 0.125, timing: SC.Animatable.TIMING_EASE_IN_OUT }, 
+	  top: { duration: 0.25, timing: SC.Animatable.TIMING_EASE_IN_OUT }, 
+	  left: 0.25, display: 0.5 
+	},
 	
 	show: function()
 	{
@@ -183,7 +187,7 @@ SC.mixin(Forms.FormAnimation, {
 });
 
 Forms.DemoTransitions = {
-	transitions: { opacity: .75, top: .75, left: .75, display: 1.25 }
+	transitions: { opacity: 0.75, top: 0.75, left: 0.75, display: 1.25 }
 };
 
 Forms.FormAnimation.DemoMode = {

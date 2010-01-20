@@ -315,8 +315,9 @@ Forms.FormRowView = Forms.FormView.extend(
 			// handle key
 			if (field.firstKeyView)
 			{
-				if (currentKeyView) currentKeyView.nextKeyView = field.firstKeyView;
-				field.firstKeyView.previousKeyView = currentKeyView;
+				if (currentKeyView) currentKeyView.nextValidKeyView = field.firstKeyView;
+				field.firstKeyView.previousValidKeyView = currentKeyView;
+				field.lastKeyView.nextValidKeyView = null;
 				currentKeyView = field.lastKeyView;
 				
 				// propagate first
