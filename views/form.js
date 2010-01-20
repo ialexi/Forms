@@ -393,6 +393,11 @@ Forms.FormView = SC.View.extend(SC.Editable, /** @scope Forms.FormView.prototype
     var parentView = this.get("parentView");
     if (parentView && parentView.emptinessDidChangeFor) parentView.emptinessDidChangeFor(this);
   }.observes("isEmpty"),
+  
+  didAppendToDocument: function() {
+    sc_super();
+    this.relayoutFields();
+  },
 
   layoutChildViews: function()
   {
