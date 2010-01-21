@@ -33,6 +33,11 @@ Forms.FormRadioView = Forms.FormFieldView.extend(
 				sc_super();
 				this.measure();
 			},
+      
+      layoutChildViews: function(){
+        sc_super();
+        this.measure();
+      },
 			
 			measure: function()
 			{

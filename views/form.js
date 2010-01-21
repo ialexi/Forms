@@ -394,7 +394,7 @@ Forms.FormView = SC.View.extend(SC.Editable, /** @scope Forms.FormView.prototype
     if (parentView && parentView.emptinessDidChangeFor) parentView.emptinessDidChangeFor(this);
   }.observes("isEmpty"),
   
-  didAppendToDocument: function() {
+  didUpdateLayer: function() {
     sc_super();
     this.relayoutFields();
   },
